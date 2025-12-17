@@ -35,7 +35,9 @@ def run_workflow():
     print(f"Loaded dataset with shape: {df.shape}")
 
     # 2) Validate
-    validator = DataValidator(required_columns=["date", "revenue", "orders", "order_value"])
+    validator = DataValidator(
+        required_columns=["date", "revenue", "orders", "order_value"]
+    )
     validator.run_all_checks(
         df,
         range_rules={
@@ -46,19 +48,22 @@ def run_workflow():
     )
     print("Validation passed.")
 
-    # 3) Compute metrics + KPIs
+    # 3) Compute metrics
     kpi_rules = {
         "total_revenue": {"column": "revenue", "agg": "sum"},
         "avg_order_value": {"column": "order_value", "agg": "mean"},
         "max_orders": {"column": "orders", "agg": "max"},
     }
+
     engine = MetricsEngine()
     results = engine.run(df, kpi_rules=kpi_rules)
     print("Metrics computed.")
 
     # 4) Deliver report + audit log
     delivery = ReportDelivery(output_dir="outputs", log_dir="logs")
-    report_path = delivery.export_metrics_to_json(results, filename="report_metrics.json")
+    report_path = delivery.export_metrics_to_json(
+        results, filename="report_metrics.json"
+    )
     log_path = delivery.log_delivery_event(report_path=report_path)
 
     print(f"Report exported to: {report_path}")
