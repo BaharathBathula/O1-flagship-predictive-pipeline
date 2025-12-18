@@ -41,3 +41,18 @@ class ReportDelivery:
             f.write(json.dumps(log_entry) + "\n")
         return log_file
 
+def export_full_report_to_json(self, metrics, insights: dict, filename: str):
+    payload = {
+        "generated_at": datetime.utcnow().isoformat(),
+        "metrics": [
+            {"name": m.name, "value": m.value, "metadata": getattr(m, "metadata", None)}
+            for m in metrics
+        ],
+        "insights": insights,
+    }
+    filepath = os.path.join(self.output_dir, filename)
+    with open(filepath, "w") as f:
+        json.dump(payload, f, indent=2)
+    return filepath
+
+
